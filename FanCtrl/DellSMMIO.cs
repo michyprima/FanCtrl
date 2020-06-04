@@ -14,9 +14,14 @@ namespace FanCtrl
         public const uint DELL_SMM_IO_FAN1 = 0;
         public const uint DELL_SMM_IO_FAN2 = 1;
 
+        public const uint DELL_SMM_IO_GET_POWER_STATUS = 0x0069;
+        public const uint DELL_SMM_IO_POWER_STATUS_AC = 0x05;
+        public const uint DELL_SMM_IO_POWER_STATUS_BATTERY = 0x01;
+
         public const uint DELL_SMM_IO_GET_SENSOR_TEMP = 0x10a3;
         public const uint DELL_SMM_IO_SENSOR_CPU = 0; // Probably Core 1
         public const uint DELL_SMM_IO_SENSOR_GPU = 5; // ?? how many sensors
+        public const uint DELL_SMM_IO_SENSOR_MAX_TEMP = 127;
 
         public const uint DELL_SMM_IO_SET_FAN_LV = 0x01a3;
         public const uint DELL_SMM_IO_GET_FAN_LV = 0x00a3;
@@ -78,17 +83,29 @@ namespace FanCtrl
         {
             uint result = 0;
 
-            for(uint i = 0; i < 100; i++)
+            uint dest = DELL_SMM_IO_SENSOR_GPU;
+
+            if (!IsOnAC())
+                dest--;
+
+            for(uint i = 0; i <= dest; i++)
             {
-                uint current = dell_smm_io(DELL_SMM_IO_GET_SENSOR_TEMP, i);
+                uint current = dell_smm_io(DELL_SMM_IO_GET_SENSOR_TEMP, i) & 0xff;
 
                 if (current == 0)
                     break;
+                else if (current > DELL_SMM_IO_SENSOR_MAX_TEMP)
+                    continue;
 
                 result = Math.Max(result, current);
             }
 
             return result;
+        }
+
+        public bool IsOnAC()
+        {
+            return dell_smm_io(DELL_SMM_IO_GET_POWER_STATUS, DELL_SMM_IO_NO_ARG) == DELL_SMM_IO_POWER_STATUS_AC;
         }
 
         public bool Open()
