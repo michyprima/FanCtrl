@@ -79,25 +79,22 @@ namespace FanCtrl
             return true;
         }
 
+        ushort[] badSensors = new ushort[DELL_SMM_IO_SENSOR_GPU+1];
+
         public uint MaxTemperature()
         {
             uint result = 0;
 
-            uint dest = DELL_SMM_IO_SENSOR_GPU;
-
-            if (!IsOnAC())
-                dest--;
-
-            for(uint i = 0; i <= dest; i++)
+            for(uint i = 0; i <= DELL_SMM_IO_SENSOR_GPU; i++)
             {
                 uint current = dell_smm_io(DELL_SMM_IO_GET_SENSOR_TEMP, i) & 0xff;
 
-                if (current == 0)
-                    break;
-                else if (current > DELL_SMM_IO_SENSOR_MAX_TEMP)
-                    continue;
-
-                result = Math.Max(result, current);
+                if (current == 0 || current > DELL_SMM_IO_SENSOR_MAX_TEMP)
+                    badSensors[i] = 15;
+                else if (badSensors[i] > 0)
+                    badSensors[i]--;
+                else
+                    result = Math.Max(result, current);
             }
 
             return result;
