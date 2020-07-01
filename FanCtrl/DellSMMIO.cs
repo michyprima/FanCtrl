@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using DellFanControl;
+using Microsoft.Win32;
 
 //Parts taken from https://github.com/marcharding/DellFanControl
 
@@ -87,6 +88,9 @@ namespace FanCtrl
 
             for(uint i = 0; i <= DELL_SMM_IO_SENSOR_GPU; i++)
             {
+                if (i == 1)
+                    continue; //skip the chipset, it's not even cooled
+
                 uint current = dell_smm_io(DELL_SMM_IO_GET_SENSOR_TEMP, i) & 0xff;
 
                 if (current == 0 || current > DELL_SMM_IO_SENSOR_MAX_TEMP)
@@ -116,6 +120,14 @@ namespace FanCtrl
                     IntPtr.Zero);
 
             return hDriver != IntPtr.Zero;
+        }
+
+        public bool Opened
+        {
+            get
+            {
+                return hDriver != IntPtr.Zero;
+            }
         }
 
         public Boolean BDSID_StartDriver()

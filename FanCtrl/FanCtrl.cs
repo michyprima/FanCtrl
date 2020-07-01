@@ -18,9 +18,27 @@ namespace FanCtrl
             timer.Elapsed += Timer_Elapsed;
         }
 
+        ushort startTries = 5;
         ushort ticksToSkip = 0;
+        ushort ticksToSkip2 = 0;
         private void Timer_Elapsed(object sender, EventArgs e)
         {
+            if (!io.Opened)
+            {
+                if (!io.BDSID_InstallDriver() || !io.BDSID_StartDriver() || !io.Open())
+                {
+                    startTries--;
+
+                    if (startTries == 0)
+                        Stop();
+
+                    return;
+                }
+
+                io.dell_smm_io(DellSMMIO.DELL_SMM_IO_DISABLE_FAN_CTL1, DellSMMIO.DELL_SMM_IO_NO_ARG);
+                io.dell_smm_io(DellSMMIO.DELL_SMM_IO_DISABLE_FAN_CTL2, DellSMMIO.DELL_SMM_IO_NO_ARG);
+            }
+
             uint maxTemp = io.MaxTemperature();
 
             if(maxTemp == 0)
@@ -32,10 +50,19 @@ namespace FanCtrl
             else if(maxTemp >= 65)
             {
                 ticksToSkip = 5;
-            } 
+                ticksToSkip2 = 30;
+            }
             else if (ticksToSkip > 0)
             {
                 ticksToSkip--;
+            }
+            else if (maxTemp >= 45)
+            {
+                ticksToSkip2 = 30;
+            }
+            else if (ticksToSkip2 > 0 && maxTemp <= 42)
+            {
+                ticksToSkip2--;
             }
 
             if (ticksToSkip > 0)
@@ -43,29 +70,21 @@ namespace FanCtrl
                 io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN1, DellSMMIO.DELL_SMM_IO_FAN_LV2);
                 io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN2, DellSMMIO.DELL_SMM_IO_FAN_LV2);
             }
-            else
+            else if (ticksToSkip2 > 0)
             {
                 io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN1, DellSMMIO.DELL_SMM_IO_FAN_LV1);
                 io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN2, DellSMMIO.DELL_SMM_IO_FAN_LV1);
+            }
+            else
+            {
+                io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN1, DellSMMIO.DELL_SMM_IO_FAN_LV0);
+                io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN2, DellSMMIO.DELL_SMM_IO_FAN_LV0);
             }
         }
 
         protected override void OnStart(string[] args)
         {
-            io.BDSID_InstallDriver();
-            io.BDSID_StartDriver();
-
-            if(!io.Open())
-            {
-                Stop();
-                return;
-            }
-
-            io.dell_smm_io(DellSMMIO.DELL_SMM_IO_DISABLE_FAN_CTL1, DellSMMIO.DELL_SMM_IO_NO_ARG);
-            io.dell_smm_io(DellSMMIO.DELL_SMM_IO_DISABLE_FAN_CTL2, DellSMMIO.DELL_SMM_IO_NO_ARG);
-
             timer.Start();
-
             Timer_Elapsed(null, null);
         }
 

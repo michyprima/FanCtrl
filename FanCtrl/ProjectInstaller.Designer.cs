@@ -39,9 +39,10 @@
             // 
             // serviceInstaller1
             // 
-            this.serviceInstaller1.ServiceName = "FanCtrl";
-            this.serviceInstaller1.DisplayName = "Dell Fan Controller";
             this.serviceInstaller1.Description = "Controls fans on Dell laptops using SMM IO calls.";
+            this.serviceInstaller1.DisplayName = "Dell Fan Controller";
+            this.serviceInstaller1.ServiceName = "FanCtrl";
+            this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
             // ProjectInstaller
             // 

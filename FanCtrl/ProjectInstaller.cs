@@ -15,7 +15,6 @@ namespace FanCtrl
         public ProjectInstaller()
         {
             InitializeComponent();
-            serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
         }
         protected override void OnAfterUninstall(IDictionary savedState)
         {
