@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FanCtrl", "FanCtrl\FanCtrl.csproj", "{961DAC31-B58F-46A5-B2E8-8FB7AEC137C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FanCtrlCommon", "FanCtrlCommon\FanCtrlCommon.csproj", "{04CC78FF-2C33-4F85-840C-A99F378B1559}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FanCtrlTray", "FanCtrlTray\FanCtrlTray.csproj", "{26A99202-490C-4345-AB8A-9B0A3E8C6412}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{961DAC31-B58F-46A5-B2E8-8FB7AEC137C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{961DAC31-B58F-46A5-B2E8-8FB7AEC137C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{961DAC31-B58F-46A5-B2E8-8FB7AEC137C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04CC78FF-2C33-4F85-840C-A99F378B1559}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04CC78FF-2C33-4F85-840C-A99F378B1559}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04CC78FF-2C33-4F85-840C-A99F378B1559}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04CC78FF-2C33-4F85-840C-A99F378B1559}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26A99202-490C-4345-AB8A-9B0A3E8C6412}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26A99202-490C-4345-AB8A-9B0A3E8C6412}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26A99202-490C-4345-AB8A-9B0A3E8C6412}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26A99202-490C-4345-AB8A-9B0A3E8C6412}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

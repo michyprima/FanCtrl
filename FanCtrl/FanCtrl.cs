@@ -1,13 +1,17 @@
-﻿using System;
+﻿using FanCtrlCommon;
+using System;
+using System.ServiceModel;
 using System.ServiceProcess;
 using System.Timers;
 
 namespace FanCtrl
 {
-    public partial class FanCtrl : ServiceBase
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+    public partial class FanCtrl : ServiceBase, IFanCtrlInterface
     {
         DellSMMIO io;
         Timer timer;
+        ServiceHost host;
 
         public FanCtrl()
         {
@@ -16,8 +20,12 @@ namespace FanCtrl
             timer = new Timer();
             timer.Interval = 1000;
             timer.Elapsed += Timer_Elapsed;
+            host = new ServiceHost(this, new Uri[] { new Uri("net.pipe://localhost") });
+            host.AddServiceEndpoint(typeof(IFanCtrlInterface), new NetNamedPipeBinding(), "FanCtrlInterface");
         }
 
+        sbyte fanlvl = -1;
+        uint maxTemp;
         ushort startTries = 5;
         ushort ticksToSkip = 0;
         ushort ticksToSkip2 = 0;
@@ -39,7 +47,7 @@ namespace FanCtrl
                 io.dell_smm_io(DellSMMIO.DELL_SMM_IO_DISABLE_FAN_CTL2, DellSMMIO.DELL_SMM_IO_NO_ARG);
             }
 
-            uint maxTemp = io.MaxTemperature();
+            maxTemp = io.MaxTemperature();
 
             if(maxTemp == 0)
             {
@@ -67,18 +75,15 @@ namespace FanCtrl
 
             if (ticksToSkip > 0)
             {
-                io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN1, DellSMMIO.DELL_SMM_IO_FAN_LV2);
-                io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN2, DellSMMIO.DELL_SMM_IO_FAN_LV2);
+                SetFanLevel(DellSMMIO.DELL_SMM_IO_FAN_LV2);
             }
             else if (ticksToSkip2 > 0)
             {
-                io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN1, DellSMMIO.DELL_SMM_IO_FAN_LV1);
-                io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN2, DellSMMIO.DELL_SMM_IO_FAN_LV1);
+                SetFanLevel(DellSMMIO.DELL_SMM_IO_FAN_LV1);
             }
             else
             {
-                io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN1, DellSMMIO.DELL_SMM_IO_FAN_LV0);
-                io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN2, DellSMMIO.DELL_SMM_IO_FAN_LV0);
+                SetFanLevel(DellSMMIO.DELL_SMM_IO_FAN_LV0);
             }
         }
 
@@ -86,15 +91,30 @@ namespace FanCtrl
         {
             timer.Start();
             Timer_Elapsed(null, null);
+            host.Open();
         }
 
         protected override void OnStop()
         {
+            host.Close();
             timer.Stop();
 
             io.dell_smm_io(DellSMMIO.DELL_SMM_IO_ENABLE_FAN_CTL1, DellSMMIO.DELL_SMM_IO_NO_ARG);
             io.dell_smm_io(DellSMMIO.DELL_SMM_IO_ENABLE_FAN_CTL2, DellSMMIO.DELL_SMM_IO_NO_ARG);
+            fanlvl = -1;
             io.BDSID_Shutdown();
+        }
+
+        public FanCtrlData GetData()
+        {
+            return new FanCtrlData(maxTemp,fanlvl);
+        }
+
+        void SetFanLevel(uint level)
+        {
+            io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN1, level);
+            io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN2, level);
+            fanlvl = (sbyte)level;
         }
     }
 }
