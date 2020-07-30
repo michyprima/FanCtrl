@@ -10,6 +10,9 @@ This is a service that will load at windows startup. When it starts it will load
 The fans will stop under 42 °C, run at 50% over 45 °C (30 seconds cooldown) and go full speed over 65 °C (5 seconds cooldown). You can customize this in `FanCtrl.cs`.
 My goal was to keep my keyboard cool (I've got fairy fingers) without having to deal with SpeedFan.
 
+### Monitoring
+FanCtrl now includes FanCtrlTray, which shows your current temperature and fan speed level in your tray. Icon border colors are green (0%), white (50%) and red (100%).
+
 # Installation
 
 ### Enable cross-signed drivers.
