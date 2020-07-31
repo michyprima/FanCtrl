@@ -21,7 +21,7 @@ namespace FanCtrl
             timer.Interval = 1000;
             timer.Elapsed += Timer_Elapsed;
             host = new ServiceHost(this, new Uri[] { new Uri("net.pipe://localhost") });
-            host.AddServiceEndpoint(typeof(IFanCtrlInterface), new NetNamedPipeBinding(), "FanCtrlInterface");
+            host.AddServiceEndpoint(typeof(IFanCtrlInterface), new NetNamedPipeBinding(NetNamedPipeSecurityMode.None), "FanCtrlInterface");
         }
 
         sbyte fanlvl = -1;

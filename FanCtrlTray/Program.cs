@@ -20,7 +20,7 @@ namespace FanCtrlTray
 
         static void Main(string[] args)
         {
-            ChannelFactory<IFanCtrlInterface> pipeFactory = new ChannelFactory<IFanCtrlInterface>(new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/FanCtrlInterface"));
+            ChannelFactory<IFanCtrlInterface> pipeFactory = new ChannelFactory<IFanCtrlInterface>(new NetNamedPipeBinding(NetNamedPipeSecurityMode.None), new EndpointAddress("net.pipe://localhost/FanCtrlInterface"));
             IFanCtrlInterface interf = null;
 
             ContextMenuStrip strip = new ContextMenuStrip();
@@ -40,7 +40,7 @@ namespace FanCtrlTray
             Graphics graph = Graphics.FromImage(bitmap);
             SizeF txtSize;
             string txt;
-            sbyte fanlvl;
+            byte fanlvl;
             FanCtrlData d;
 
             uint counter = 0;
@@ -61,7 +61,7 @@ namespace FanCtrlTray
                         else
                             txt = "!";
 
-                        fanlvl = d.FanLevel;
+                        fanlvl = Math.Min((byte)d.FanLevel, (byte)2);
                     }
                     catch (Exception)
                     {
@@ -90,7 +90,15 @@ namespace FanCtrlTray
             }
 
             icon.Visible = false;
-            pipeFactory.Close();
+
+            try
+            {
+                pipeFactory.Close();
+            }
+            catch(Exception)
+            {
+
+            }
         }
 
         private static void Strip_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
