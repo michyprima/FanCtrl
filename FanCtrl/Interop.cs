@@ -184,6 +184,7 @@ namespace DellFanControl
         public const int OPEN_EXISTING = 3;
         public const uint BZH_DELL_SMM_IOCTL_KEY = 0xB42;
         public const uint FILE_DEVICE_BZH_DELL_SMM = 0x0000B424;
+        public const uint IOCTL_BZH_DELL_SMM_RWREG = (FILE_DEVICE_BZH_DELL_SMM << 16) | (BZH_DELL_SMM_IOCTL_KEY << 2);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool CloseHandle(IntPtr hHandle);

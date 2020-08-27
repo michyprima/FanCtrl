@@ -193,12 +193,10 @@ namespace FanCtrl
                 stat2 = 0
             };
 
-            uint IOCTL_BZH_DELL_SMM_RWREG = Interop.CTL_CODE(Interop.FILE_DEVICE_BZH_DELL_SMM, Interop.BZH_DELL_SMM_IOCTL_KEY, 0, 0);
-
             uint result_size = 0;
 
-            bool status_dic = Interop.DeviceIoControl(this.hDriver,
-                IOCTL_BZH_DELL_SMM_RWREG,
+            bool status_dic = Interop.DeviceIoControl(hDriver,
+                Interop.IOCTL_BZH_DELL_SMM_RWREG,
                 ref cam,
                 (uint)Marshal.SizeOf(cam),
                 ref cam,
