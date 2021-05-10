@@ -17,15 +17,20 @@ namespace FanCtrlTray
         const int CyclesToWaste = (UpdateTime / CycleTime) - 1;
 
         static bool run = true;
+        static IFanCtrlInterface interf = null;
+        static ToolStripMenuItem forceItem = null;
+        static ToolStripItem exitItem = null;
+
 
         static void Main(string[] args)
         {
             ChannelFactory<IFanCtrlInterface> pipeFactory = new ChannelFactory<IFanCtrlInterface>(new NetNamedPipeBinding(NetNamedPipeSecurityMode.None), new EndpointAddress("net.pipe://localhost/FanCtrlInterface"));
-            IFanCtrlInterface interf = null;
 
             ContextMenuStrip strip = new ContextMenuStrip();
 
-            strip.Items.Add("Exit");
+            forceItem = (ToolStripMenuItem)strip.Items.Add("Force full speed");
+            strip.Items.Add("-");
+            exitItem = strip.Items.Add("Exit");
             strip.ItemClicked += Strip_ItemClicked;
 
             NotifyIcon icon = new NotifyIcon();
@@ -62,8 +67,10 @@ namespace FanCtrlTray
                             txt = "!";
 
                         fanlvl = Math.Min((byte)d.FanLevel, (byte)2);
+
+                        forceItem.Checked = interf.Level2IsForced();
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
                         txt = "?";
                         fanlvl = 2;
@@ -103,7 +110,14 @@ namespace FanCtrlTray
 
         private static void Strip_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            run = false;
+            if (e.ClickedItem == exitItem)
+            {
+                run = false;
+            }
+            else if (e.ClickedItem == forceItem && interf != null)
+            {
+                interf.SetLevel2IsForced(forceItem.Checked = !forceItem.Checked);
+            }
         }
     }
 }

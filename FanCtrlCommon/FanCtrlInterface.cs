@@ -8,6 +8,10 @@ namespace FanCtrlCommon
     {
         [OperationContract]
         FanCtrlData GetData();
+        [OperationContract]
+        bool Level2IsForced();
+        [OperationContract]
+        void SetLevel2IsForced(bool forced);
     }
 
     [DataContract]

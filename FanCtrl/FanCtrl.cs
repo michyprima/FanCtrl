@@ -29,6 +29,9 @@ namespace FanCtrl
         ushort startTries = 5;
         ushort ticksToSkip = 0;
         ushort ticksToSkip2 = 0;
+        bool _level2forced = false;
+
+
         private void Timer_Elapsed(object sender, EventArgs e)
         {
             if (!io.Opened)
@@ -79,11 +82,12 @@ namespace FanCtrl
             }
             else if (ticksToSkip2 > 0)
             {
-                SetFanLevel(DellSMMIO.DELL_SMM_IO_FAN_LV1);
+                SetFanLevel(_level2forced ? DellSMMIO.DELL_SMM_IO_FAN_LV2 : DellSMMIO.DELL_SMM_IO_FAN_LV1);
             }
             else
             {
                 SetFanLevel(DellSMMIO.DELL_SMM_IO_FAN_LV0);
+                _level2forced = false;
             }
         }
 
@@ -115,6 +119,16 @@ namespace FanCtrl
             io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN1, level);
             io.dell_smm_io_set_fan_lv(DellSMMIO.DELL_SMM_IO_FAN2, level);
             fanlvl = (sbyte)level;
+        }
+
+        public bool Level2IsForced()
+        {
+            return _level2forced;
+        }
+
+        public void SetLevel2IsForced(bool forced)
+        {
+            _level2forced = forced;
         }
     }
 }
